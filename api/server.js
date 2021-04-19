@@ -2,6 +2,8 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 
+const authRouter = require("../api/auth/auth-router.js")
+const usersRouter = require('../api/users/users-router.js')
 /**
   Do what needs to be done to support sessions with the `express-session` package!
   To respect users' privacy, do NOT send them a cookie unless they log in.
@@ -17,14 +19,18 @@ const cors = require("cors");
 
 const server = express();
 
-server.use(helmet());
+server.use(helmet()); // a collection of security related middlewares. it fixes up your response headers.
 server.use(express.json());
-server.use(cors());
+server.use(cors()); // cors allows us to access APIs from multiple origins. ALlows cross-origin-requests.
+
+server.use('/api/auth', authRouter);
+server.use('/api/users', usersRouter);
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
 });
 
+//ERROR HANDLING MIDDLEWARE.
 server.use((err, req, res, next) => { // eslint-disable-line
   res.status(err.status || 500).json({
     message: err.message,
