@@ -6,8 +6,12 @@
     "message": "You shall not pass!"
   }
 */
-function restricted() {
-
+function restricted(req,res,next) {
+if(req.session.user){
+  next()
+}else{
+  next({"message": "You shall not pass!"})
+}
 }
 
 /*
@@ -47,3 +51,9 @@ function checkPasswordLength() {
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
+module.exports={
+  restricted,
+  checkUsernameExists,
+  checkUsernameFree,
+  checkPasswordLength
+}

@@ -1,5 +1,5 @@
 // Require the `restricted` middleware from `auth-middleware.js`. You will need it here!
-
+const mw = require("../auth/auth-middleware.js")
 // - [ ] `[GET] /api/users`
 // - [ ] `[POST] /api/auth/register`
 // - [ ] `[POST] /api/auth/login`
@@ -8,7 +8,7 @@
 const router = require('express').Router()
 const Users = require('./users-model.js')
 
-router.get('/', (req,res,next)=>{
+router.get('/',  (req,res,next)=>{
   res.json({message: "hi!"})
 })
 

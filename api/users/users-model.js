@@ -12,7 +12,7 @@ return db("users").select("user_id", "username").orderBy("user_id")
 function findBy(filter) {
   return db("users").where(filter).orderBy("user_id")
 }
-
+//^^^RETURNS A COLLECTION OF USERS
 /**
   resolves to the user { user_id, username } with the given user_id
  */
