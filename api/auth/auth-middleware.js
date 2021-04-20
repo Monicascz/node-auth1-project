@@ -7,7 +7,9 @@
   }
 */
 function restricted(req,res,next) {
-if(req.session.user){
+  //job is to check if req.session.user is there. 
+if(req.session.user){ //the beauty of this line is that this line does everything.
+  //the test fails if there is no cookie, if the cookie is invalid, if the cookie is expired, if there is no user in the sessions array with a session corresponding to the cookie,...
   next()
 }else{
   next({"message": "You shall not pass!"})

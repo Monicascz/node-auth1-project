@@ -8,8 +8,12 @@ const mw = require("../auth/auth-middleware.js")
 const router = require('express').Router()
 const Users = require('./users-model.js')
 
-router.get('/',  (req,res,next)=>{
-  res.json({message: "hi!"})
+router.get('/', mw.restricted, (req,res,next)=>{
+  Users.find()
+  .then(users=>{
+    res.status(200).json(users)
+  })
+  .catch(next)
 })
 
 /**

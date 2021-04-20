@@ -30,9 +30,11 @@ router.post('/login', async (req,res,next)=>{
   if(user && bcrypt.compareSync(password, user.password)){ //compares the plain text password to the hash.
     // the good path, where we save the session
     // step 3 - if password good ,save session. 
-    res.json({message: `welcome back ${username}`})
+    //create a user property that is equal to the user that just logged in. 
+    req.session.user = user // without this line, the session is not saved and the cookie is not set. VERY IMPORTANT
+    res.json({message: `welcome ${username}`})
   }else{
-    next({status:401, message: "unauthorized"})
+    next({status:401, message: "invalid credentials"})
   }
   })
 
