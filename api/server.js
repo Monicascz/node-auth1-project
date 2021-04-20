@@ -1,7 +1,11 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
+const session = require('express-session')
+const KnexSessionStore  = require('connect-session-knex')(session)
 
+const authRouter = require("../api/auth/auth-router.js")
+const usersRouter = require('../api/users/users-router.js')
 /**
   Do what needs to be done to support sessions with the `express-session` package!
   To respect users' privacy, do NOT send them a cookie unless they log in.
@@ -17,14 +21,39 @@ const cors = require("cors");
 
 const server = express();
 
-server.use(helmet());
+
+server.use(session({
+  // config of cookie and session store
+  name: 'chocolatechip',// we name this so that the cookie does not reveal what it holds.
+  secret: 'keep it secret, keep it safe!', // env not from code. // allows the server to sign the cookie to make it look long and randomg.
+  cookie: {
+    maxAge: 1000 * 60 * 60, // how long the cookie lives for.
+    secure: false, // if true the cookie is not set unless it's an https connection
+    httpOnly: false, // if true the cookie is not accessible through document.cookie
+  },
+  resave: false, // some data stores need this set to true
+  saveUninitialized: false, // privacy implications, if false no cookie is set on client unless the req.session is changed
+  store: new KnexSessionStore({
+    knex: require('../data/db-config.js'), // configured instance of knex
+    tablename: 'sessions', // table that will store sessions inside the db, name it anything you want
+    sidfieldname: 'sid', // column that will hold the session id, name it anything you want
+    createtable: true, // if the table does not exist, it will create it automatically
+    clearInterval: 1000 * 60 * 60, // time it takes to check for old sessions and remove them from the database to keep it clean and performant
+  }),
+}));//need to pass a ton of configuration to session()
+
+server.use(helmet()); // a collection of security related middlewares. it fixes up your response headers.
 server.use(express.json());
-server.use(cors());
+server.use(cors()); // cors allows us to access APIs from multiple origins. ALlows cross-origin-requests.
+
+server.use('/api/auth', authRouter);
+server.use('/api/users', usersRouter);
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
 });
 
+//ERROR HANDLING MIDDLEWARE.
 server.use((err, req, res, next) => { // eslint-disable-line
   res.status(err.status || 500).json({
     message: err.message,

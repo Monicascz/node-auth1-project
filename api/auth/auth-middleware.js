@@ -1,3 +1,5 @@
+const dbConfig = require("../../data/db-config")
+const Users = require('../users/users-model.js')
 /*
   If the user does not have a session saved in the server
 
@@ -6,8 +8,14 @@
     "message": "You shall not pass!"
   }
 */
-function restricted() {
-
+function restricted(req,res,next) {
+  //job is to check if req.session.user is there. 
+if(req.session.user){ //the beauty of this line is that this line does everything.
+  //the test fails if there is no cookie, if the cookie is invalid, if the cookie is expired, if there is no user in the sessions array with a session corresponding to the cookie,...
+  next()
+}else{
+  next({"message": "You shall not pass!"})
+}
 }
 
 /*
@@ -18,7 +26,14 @@ function restricted() {
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
+async function checkUsernameFree(req,res,next) {
+  const {username} = req.body
+  const [user] = await Users.findBy(username)
+  if(user){
+    res.status(422).json({message:"Username taken"})
+  }else{
+    next()
+  }
 
 }
 
@@ -30,8 +45,14 @@ function checkUsernameFree() {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists() {
-
+async function checkUsernameExists(req,res,next) {
+  const {username} = req.body
+  const [user] = await Users.findBy(username)
+  if(user.username === username){
+    res.status(401).json({message:"Invalid credentials"})
+  }else{
+    next()
+  }
 }
 
 /*
@@ -42,8 +63,19 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
-
+function checkPasswordLength(req,res,next) {
+  const {password}=req.body
+  if (!password || password.length <= 3){
+    res.status(422).json({message:"Password must be longer than 3 chars"})
+  }else{
+    next()
+  }
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
+module.exports={
+  restricted,
+  checkUsernameExists,
+  checkUsernameFree,
+  checkPasswordLength
+}
