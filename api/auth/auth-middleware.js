@@ -1,5 +1,5 @@
 const dbConfig = require("../../data/db-config")
-
+const Users = require('../users/users-model.js')
 /*
   If the user does not have a session saved in the server
 
@@ -26,9 +26,14 @@ if(req.session.user){ //the beauty of this line is that this line does everythin
     "message": "Username taken"
   }
 */
-function checkUsernameFree(req,res,next) {
+async function checkUsernameFree(req,res,next) {
   const {username} = req.body
-  //  if(username===){}
+  const [user] = await Users.findBy(username)
+  if(user){
+    res.status(422).json({message:"Username taken"})
+  }else{
+    next()
+  }
 
 }
 
@@ -40,8 +45,14 @@ function checkUsernameFree(req,res,next) {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists() {
-
+async function checkUsernameExists(req,res,next) {
+  const {username} = req.body
+  const [user] = await Users.findBy(username)
+  if(user.username === username){
+    res.status(401).json({message:"Invalid credentials"})
+  }else{
+    next()
+  }
 }
 
 /*

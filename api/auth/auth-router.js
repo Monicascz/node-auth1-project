@@ -6,7 +6,9 @@ const { add, findBy } = require('../users/users-model.js')
 const mw = require("./auth-middleware.js")
 
 //add middlewares here for 
-router.post('/register', mw.checkPasswordLength, (req,res,next)=>{
+//mw.checkUsernameFree,
+//mw.checkUsernameExists,
+router.post('/register', mw.checkPasswordLength,   (req,res,next)=>{
   const {username, password} = req.body
 
   const hash = bcrypt.hashSync(password, 8)
@@ -20,7 +22,7 @@ router.post('/register', mw.checkPasswordLength, (req,res,next)=>{
 })
 
 //loggin in pulls username and password from request body, and then checking whether the username exists in the database and then checking if the password is a match.
-router.post('/login', async (req,res,next)=>{
+router.post('/login',  async (req,res,next)=>{
   const {username, password} = req.body
   //step 1 - find user using username
   
