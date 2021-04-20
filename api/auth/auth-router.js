@@ -3,9 +3,10 @@
 const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 const { add, findBy } = require('../users/users-model.js')
+const mw = require("./auth-middleware.js")
 
 //add middlewares here for 
-router.post('/register', (req,res,next)=>{
+router.post('/register', mw.checkPasswordLength, (req,res,next)=>{
   const {username, password} = req.body
 
   const hash = bcrypt.hashSync(password, 8)

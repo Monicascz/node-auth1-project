@@ -1,3 +1,5 @@
+const dbConfig = require("../../data/db-config")
+
 /*
   If the user does not have a session saved in the server
 
@@ -24,7 +26,9 @@ if(req.session.user){ //the beauty of this line is that this line does everythin
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
+function checkUsernameFree(req,res,next) {
+  const {username} = req.body
+  //  if(username===){}
 
 }
 
@@ -48,8 +52,13 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
-
+function checkPasswordLength(req,res,next) {
+  const {password}=req.body
+  if (!password || password.length <= 3){
+    res.status(422).json({message:"Password must be longer than 3 chars"})
+  }else{
+    next()
+  }
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
