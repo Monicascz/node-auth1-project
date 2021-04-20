@@ -39,7 +39,19 @@ router.post('/login', async (req,res,next)=>{
   })
 
 router.get('/logout', (req,res,next)=>{
-  res.json("logout")
+  //allow client to make a request to this endpoint. 
+  if(req.session.user){
+    //log out
+    req.session.destroy(err=>{
+      if(err){
+        next({message:"sorry you cannot leave. "})
+      }else{
+        res.json({message: "logged out"})
+      }
+    }) //async
+  } else{
+    next({message: "no session"})
+  }
 })
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
